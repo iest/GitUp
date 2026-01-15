@@ -36,6 +36,7 @@
 @property(nonatomic, weak) IBOutlet NSView* diffContentsView;
 @property(nonatomic, weak) IBOutlet NSButton* unstageButton;
 @property(nonatomic, weak) IBOutlet NSButton* commitButton;
+@property(nonatomic, weak) IBOutlet NSButton* generateCommitMessageButton;
 @property(nonatomic, weak) IBOutlet NSButton* stageButton;
 @property(nonatomic, weak) IBOutlet NSButton* discardButton;
 @end
@@ -49,6 +50,96 @@
   NSDictionary* _indexConflicts;
   BOOL _indexActive;
   BOOL _disableFeedback;
+  NSProgressIndicator* _generateCommitMessageSpinner;
+  NSImage* _generateCommitMessageImage;
+}
+
+- (NSString*)_escapeForBashDoubleQuotes:(NSString*)string {
+  NSString* escaped = [string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
+  escaped = [escaped stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+  escaped = [escaped stringByReplacingOccurrencesOfString:@"$" withString:@"\\$"];
+  escaped = [escaped stringByReplacingOccurrencesOfString:@"`" withString:@"\\`"];
+  return escaped;
+}
+
+- (NSString*)_commitPromptText:(NSError**)error {
+  NSString* path = [[NSBundle mainBundle] pathForResource:@"commit_promp" ofType:@"txt"];
+  if (!path) {
+    if (error) {
+      *error = GCNewError(kGCErrorCode_Generic, @"Missing commit_promp.txt in application bundle");
+    }
+    return nil;
+  }
+  NSString* prompt = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:error];
+  if (!prompt.length && error && !*error) {
+    *error = GCNewError(kGCErrorCode_Generic, @"commit_promp.txt is empty");
+  }
+  return prompt;
+}
+
+- (NSString*)_stagedDiffText:(NSError**)error {
+  GCDiff* diff = [self.repository diffRepositoryIndexWithHEAD:nil
+                                                      options:(self.repository.diffBaseOptions | kGCDiffOption_FindRenames)
+                                            maxInterHunkLines:self.repository.diffMaxInterHunkLines
+                                              maxContextLines:self.repository.diffMaxContextLines
+                                                        error:error];
+  if (!diff) {
+    return nil;
+  }
+  if (!diff.modified) {
+    return @"";
+  }
+
+  NSMutableString* diffText = [[NSMutableString alloc] init];
+  for (GCDiffDelta* delta in diff.deltas) {
+    BOOL isBinary = NO;
+    GCDiffPatch* patch = [self.repository makePatchForDiffDelta:delta isBinary:&isBinary error:error];
+    if (!patch) {
+      return nil;
+    }
+    NSString* patchText = [patch patchString:error];
+    if (!patchText) {
+      return nil;
+    }
+    [diffText appendString:patchText];
+    if (![patchText hasSuffix:@"\n"]) {
+      [diffText appendString:@"\n"];
+    }
+  }
+  return diffText;
+}
+
+- (NSString*)_runCodexExecWithInput:(NSString*)input error:(NSError**)error {
+  NSString* escapedInput = [self _escapeForBashDoubleQuotes:input];
+  NSString* command = [NSString stringWithFormat:@"codex exec \"%@\" 2>/dev/null", escapedInput];
+
+  NSPipe* outputPipe = [NSPipe pipe];
+  NSTask* task = [[NSTask alloc] init];
+  task.launchPath = @"/bin/bash";
+  task.arguments = @[ @"-lc", command ];
+  task.currentDirectoryPath = self.repository.workingDirectoryPath;
+  task.standardOutput = outputPipe;
+  task.standardError = [NSFileHandle fileHandleWithNullDevice];
+
+  @try {
+    [task launch];
+    NSData* outputData = [[outputPipe fileHandleForReading] readDataToEndOfFile];
+    [task waitUntilExit];
+    if (task.terminationStatus != 0) {
+      if (error) {
+        *error = [NSError errorWithDomain:NSPOSIXErrorDomain
+                                     code:task.terminationStatus
+                                 userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"codex exec exited with status %i", task.terminationStatus]}];
+      }
+      return nil;
+    }
+    return [[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding];
+  } @catch (NSException* exception) {
+    if (error) {
+      *error = GCNewError(kGCErrorCode_Generic, exception.reason);
+    }
+    return nil;
+  }
 }
 
 - (void)loadView {
@@ -76,6 +167,26 @@
   [_diffContentsView replaceWithView:_diffContentsViewController.view];
 
   self.messageTextView.string = @"";
+
+  if (@available(macOS 11.0, *)) {
+    _generateCommitMessageImage = [NSImage imageWithSystemSymbolName:@"sparkles" accessibilityDescription:NSLocalizedString(@"Generate commit message", nil)];
+  } else {
+    _generateCommitMessageImage = [NSImage imageNamed:NSImageNameActionTemplate];
+  }
+  _generateCommitMessageButton.image = _generateCommitMessageImage;
+  _generateCommitMessageButton.imagePosition = NSImageOnly;
+  _generateCommitMessageButton.title = @"";
+
+  _generateCommitMessageSpinner = [[NSProgressIndicator alloc] initWithFrame:NSZeroRect];
+  _generateCommitMessageSpinner.style = NSProgressIndicatorStyleSpinning;
+  _generateCommitMessageSpinner.controlSize = NSControlSizeSmall;
+  _generateCommitMessageSpinner.displayedWhenStopped = NO;
+  _generateCommitMessageSpinner.translatesAutoresizingMaskIntoConstraints = NO;
+  [_generateCommitMessageButton addSubview:_generateCommitMessageSpinner];
+  [NSLayoutConstraint activateConstraints:@[
+    [_generateCommitMessageSpinner.centerXAnchor constraintEqualToAnchor:_generateCommitMessageButton.centerXAnchor],
+    [_generateCommitMessageSpinner.centerYAnchor constraintEqualToAnchor:_generateCommitMessageButton.centerYAnchor]
+  ]];
 }
 
 - (void)viewWillAppear {
@@ -122,6 +233,7 @@
 
 - (void)_updateCommitButton {
   _commitButton.enabled = _indexStatus.modified || (self.repository.state == kGCRepositoryState_Merge) || self.amendButton.state;  // Creating an empty commit is OK for a merge or when amending
+  _generateCommitMessageButton.enabled = _indexStatus.modified;
 }
 
 - (void)_reloadContents {
@@ -637,6 +749,55 @@
   }
   [self createCommitFromHEADWithMessage:message];
   [self _updateCommitButton];
+}
+
+- (IBAction)generateCommitMessage:(id)sender {
+  NSError* error;
+  NSString* prompt = [self _commitPromptText:&error];
+  if (!prompt) {
+    [self presentError:error];
+    return;
+  }
+  NSString* diffText = [self _stagedDiffText:&error];
+  if (diffText == nil) {
+    [self presentError:error];
+    return;
+  }
+  if (diffText.length == 0) {
+    [self presentAlertWithType:kGIAlertType_Note title:NSLocalizedString(@"No staged changes to summarize", nil) message:nil];
+    return;
+  }
+
+  NSString* input = [NSString stringWithFormat:@"%@\n\n%@", prompt, diffText];
+  _generateCommitMessageButton.enabled = NO;
+  _generateCommitMessageButton.image = nil;
+  [_generateCommitMessageSpinner startAnimation:nil];
+  dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+    NSError* taskError;
+    NSString* output = [self _runCodexExecWithInput:input error:&taskError];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      _generateCommitMessageButton.enabled = YES;
+      [_generateCommitMessageSpinner stopAnimation:nil];
+      _generateCommitMessageButton.image = _generateCommitMessageImage;
+      if (!output) {
+        [self presentError:taskError];
+        return;
+      }
+      NSString* trimmed = [output stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+      if (!trimmed.length) {
+        [self presentAlertWithType:kGIAlertType_Note title:NSLocalizedString(@"No commit message generated", nil) message:nil];
+        return;
+      }
+      NSMutableString* message = [self.messageTextView.string mutableCopy];
+      if (message.length && ![message hasSuffix:@"\n"]) {
+        [message appendString:@"\n"];
+      }
+      [message appendString:trimmed];
+      self.messageTextView.string = message;
+      [self.messageTextView setSelectedRange:NSMakeRange(self.messageTextView.string.length, 0)];
+      [self _updateCommitButton];
+    });
+  });
 }
 
 @end

@@ -124,6 +124,10 @@ typedef void (^GCDiffEndHunkHandler)(void);
                         endHunkHandler:(GCDiffEndHunkHandler)endHunkHandler;
 @end
 
+@interface GCDiffPatch (Extensions)
+- (NSString*)patchString:(NSError**)error;
+@end
+
 @interface GCRepository (GCDiff)
 - (GCDiff*)diffWorkingDirectoryWithCommit:(GCCommit*)commit  // May be nil
                                usingIndex:(GCIndex*)index  // Pass nil for repository index

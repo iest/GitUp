@@ -21,6 +21,7 @@
 		0AC8525423A11F3700479160 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC8525223A11F3700479160 /* PreferencesWindowController.xib */; };
 		0AD4625B232711B000BE28D1 /* WelcomeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4625A232711B000BE28D1 /* WelcomeWindowController.m */; };
 		0AE7F5F12312C1B000B06050 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0AE7F5ED2312C1B000B06050 /* InfoPlist.strings */; };
+		A1B2C3D4E5F60718293A4B5D /* commit_promp.txt in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* commit_promp.txt */; };
 		1DE066042C3781AF00540818 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 1DE066032C3781AF00540818 /* Sparkle */; };
 		31CD50E3203E2E2800360B3A /* ToolbarItemWrapperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31CD50E2203E2E2800360B3A /* ToolbarItemWrapperView.m */; };
 		A53C6D0C1E61A9CF0070387E /* FontSizeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A53C6D0B1E61A9CF0070387E /* FontSizeTransformer.m */; };
@@ -118,6 +119,7 @@
 		0A2F488B23683DC90072C6FB /* AuthenticationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthenticationWindowController.h; sourceTree = "<group>"; };
 		0A2F488E23683DC90072C6FB /* AuthenticationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthenticationWindowController.m; sourceTree = "<group>"; };
 		0A2F489123683DD60072C6FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/AuthenticationWindowController.xib; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* commit_promp.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = commit_promp.txt; sourceTree = "<group>"; };
 		0A3388BB2353BD630022528D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/WelcomeWindowController.xib; sourceTree = "<group>"; };
 		0A58CD73237B4F4B00C2BDD0 /* CloneWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloneWindowController.m; sourceTree = "<group>"; };
 		0A58CD76237B4F4B00C2BDD0 /* CloneWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloneWindowController.h; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 				E2C338AF19F8562F00063D95 /* Info.plist */,
 				E2A5BE6E1A814970008DD47F /* Localizable.strings */,
 				0AE7F5ED2312C1B000B06050 /* InfoPlist.strings */,
+				A1B2C3D4E5F60718293A4B5C /* commit_promp.txt */,
 				E2C338B319F8562F00063D95 /* main.m */,
 				E2C338BD19F8562F00063D95 /* MainMenu.xib */,
 				A53C6D0A1E61A9CF0070387E /* FontSizeTransformer.h */,
@@ -433,6 +436,7 @@
 				0A2BBECB235F9B2400912B65 /* AboutWindowController.xib in Resources */,
 				0AE7F5F12312C1B000B06050 /* InfoPlist.strings in Resources */,
 				E2A5BE701A814970008DD47F /* Localizable.strings in Resources */,
+				A1B2C3D4E5F60718293A4B5D /* commit_promp.txt in Resources */,
 				E2C338BA19F8562F00063D95 /* Document.xib in Resources */,
 				0AC8525423A11F3700479160 /* PreferencesWindowController.xib in Resources */,
 				0A2F489223683DD60072C6FB /* AuthenticationWindowController.xib in Resources */,

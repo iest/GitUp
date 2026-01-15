@@ -158,6 +158,31 @@ static inline GCFileDiffChange _FileDiffChangeFromStatus(git_delta_t status) {
 
 @end
 
+@implementation GCDiffPatch (Extensions)
+
+- (NSString*)patchString:(NSError**)error {
+  git_buf buffer = {0};
+  int status = git_patch_to_buf(&buffer, _private);
+  if (status != GIT_OK) {
+    if (error) {
+      *error = GCNewError(status, GetLastGitErrorMessage());
+    }
+    return nil;
+  }
+
+  NSString* string = [[NSString alloc] initWithBytes:buffer.ptr length:buffer.size encoding:NSUTF8StringEncoding];
+  git_buf_dispose(&buffer);
+  if (!string) {
+    if (error) {
+      *error = GCNewError(kGCErrorCode_Generic, @"Failed to decode diff patch as UTF-8");
+    }
+    return nil;
+  }
+  return string;
+}
+
+@end
+
 @implementation GCDiffDelta {
   __unsafe_unretained GCDiff* _diff;
   size_t _index;

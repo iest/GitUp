@@ -13,6 +13,7 @@
                 <outlet property="commitButton" destination="mNK-0g-48P" id="X0j-H4-mdF"/>
                 <outlet property="diffContentsView" destination="hwM-6S-E69" id="ze2-KZ-coi"/>
                 <outlet property="discardButton" destination="4zE-Zk-8sX" id="dm8-Vg-dZ6"/>
+                <outlet property="generateCommitMessageButton" destination="QJd-g8-hLZ" id="9kV-dA-FxJ"/>
                 <outlet property="indexFilesView" destination="SLl-qM-6U5" id="q90-XG-uOo"/>
                 <outlet property="indexHeaderView" destination="0zR-9s-ty2" id="BLn-7k-Ti2"/>
                 <outlet property="infoTextField" destination="H0U-9x-3Cl" id="xIS-An-utS"/>
@@ -240,7 +241,7 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fill" orientation="horizontal" alignment="firstBaseline" spacing="17" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A6N-Vj-NFH">
-                            <rect key="frame" x="747" y="12" width="241" height="24"/>
+                            <rect key="frame" x="590" y="12" width="398" height="24"/>
                             <subviews>
                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="eFu-23-SH3">
                                     <rect key="frame" x="0.0" y="4" width="104" height="16"/>
@@ -253,8 +254,21 @@
                                         <action selector="toggleAmend:" target="-2" id="sJx-aM-le4"/>
                                     </connections>
                                 </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QJd-g8-hLZ">
+                                    <rect key="frame" x="109" y="0.0" width="28" height="24"/>
+                                    <buttonCell key="cell" type="push" title="" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="r5q-qJ-1kR">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="generateCommitMessage:" target="-2" id="SQX-hl-YVH"/>
+                                    </connections>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="24" id="cM3-q2-tPW"/>
+                                    </constraints>
+                                </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mNK-0g-48P">
-                                    <rect key="frame" x="121" y="0.0" width="120" height="24"/>
+                                    <rect key="frame" x="143" y="0.0" width="120" height="24"/>
                                     <buttonCell key="cell" type="push" title="Commit" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GtK-Iv-qM4">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -274,8 +288,10 @@ DQ
                             <visibilityPriorities>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
+                                <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                             </customSpacing>
