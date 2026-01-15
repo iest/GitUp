@@ -28,6 +28,9 @@
 #import "GIWindowController.h"
 #import "XLFacilityMacros.h"
 
+static NSString* const kCommitMessageCommandKey = @"CommitMessageCommand";
+static NSString* const kDefaultCommitMessageCommandTemplate = @"codex exec \"$PROMPT\\n\\n$DIFF\" 2>/dev/null";
+
 @interface GIAdvancedCommitViewController () <GIDiffFilesViewControllerDelegate, GIDiffContentsViewControllerDelegate>
 @property(nonatomic, weak) IBOutlet GIColorView* workdirHeaderView;
 @property(nonatomic, weak) IBOutlet NSView* workdirFilesView;
@@ -60,6 +63,14 @@
   escaped = [escaped stringByReplacingOccurrencesOfString:@"$" withString:@"\\$"];
   escaped = [escaped stringByReplacingOccurrencesOfString:@"`" withString:@"\\`"];
   return escaped;
+}
+
+- (NSString*)_expandCommitCommandTemplate:(NSString*)commandTemplate prompt:(NSString*)prompt diffText:(NSString*)diffText {
+  NSString* command = [commandTemplate stringByReplacingOccurrencesOfString:@"\\n" withString:@"\n"];
+  NSString* escapedPrompt = [self _escapeForBashDoubleQuotes:prompt];
+  NSString* escapedDiff = [self _escapeForBashDoubleQuotes:diffText];
+  command = [command stringByReplacingOccurrencesOfString:@"$PROMPT" withString:escapedPrompt];
+  return [command stringByReplacingOccurrencesOfString:@"$DIFF" withString:escapedDiff];
 }
 
 - (NSString*)_commitPromptText:(NSError**)error {
@@ -109,9 +120,18 @@
   return diffText;
 }
 
-- (NSString*)_runCodexExecWithInput:(NSString*)input error:(NSError**)error {
-  NSString* escapedInput = [self _escapeForBashDoubleQuotes:input];
-  NSString* command = [NSString stringWithFormat:@"codex exec \"%@\" 2>/dev/null", escapedInput];
+- (NSString*)_runCommitMessageCommandWithPrompt:(NSString*)prompt diffText:(NSString*)diffText error:(NSError**)error {
+  NSString* commandTemplate = [[NSUserDefaults standardUserDefaults] stringForKey:kCommitMessageCommandKey];
+  if (!commandTemplate.length) {
+    commandTemplate = kDefaultCommitMessageCommandTemplate;
+  }
+  NSString* command = [self _expandCommitCommandTemplate:commandTemplate prompt:prompt diffText:diffText];
+  if (!command.length) {
+    if (error) {
+      *error = GCNewError(kGCErrorCode_Generic, @"Commit message command is empty");
+    }
+    return nil;
+  }
 
   NSPipe* outputPipe = [NSPipe pipe];
   NSTask* task = [[NSTask alloc] init];
@@ -129,7 +149,7 @@
       if (error) {
         *error = [NSError errorWithDomain:NSPOSIXErrorDomain
                                      code:task.terminationStatus
-                                 userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"codex exec exited with status %i", task.terminationStatus]}];
+                                 userInfo:@{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Commit message command exited with status %i", task.terminationStatus]}];
       }
       return nil;
     }
@@ -768,13 +788,12 @@
     return;
   }
 
-  NSString* input = [NSString stringWithFormat:@"%@\n\n%@", prompt, diffText];
   _generateCommitMessageButton.enabled = NO;
   _generateCommitMessageButton.image = nil;
   [_generateCommitMessageSpinner startAnimation:nil];
   dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
     NSError* taskError;
-    NSString* output = [self _runCodexExecWithInput:input error:&taskError];
+    NSString* output = [self _runCommitMessageCommandWithPrompt:prompt diffText:diffText error:&taskError];
     dispatch_async(dispatch_get_main_queue(), ^{
       _generateCommitMessageButton.enabled = YES;
       [_generateCommitMessageSpinner stopAnimation:nil];

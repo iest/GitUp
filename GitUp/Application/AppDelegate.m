@@ -123,6 +123,7 @@
     kUserDefaultsKey_ShowWelcomeWindow : @(YES),
     kUserDefaultsKey_AskSetUpstreamOnPush : @(YES),
     kUserDefaultsKey_Theme : PreferencesWindowController_Theme_SystemPreference,
+    kUserDefaultsKey_CommitMessageCommand : kDefaultCommitMessageCommand,
   };
   [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }

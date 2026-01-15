@@ -26,6 +26,9 @@
 #define kUserDefaultsKey_DiffWhitespaceMode @"DiffWhitespaceMode"  // NSUInteger
 #define kUserDefaultsKey_ShowWelcomeWindow @"ShowWelcomeWindow"  // BOOL
 #define kUserDefaultsKey_Theme @"Theme"  // NSString
+#define kUserDefaultsKey_CommitMessageCommand @"CommitMessageCommand"  // NSString
+
+#define kDefaultCommitMessageCommand @"codex exec \"$PROMPT\\n\\n$DIFF\" 2>/dev/null"
 
 #define kRepositoryUserInfoKey_SkipSubmoduleCheck @"SkipSubmoduleCheck"  // BOOL
 #define kRepositoryUserInfoKey_MainWindowFrame @"MainWindowFrame"  // NSString

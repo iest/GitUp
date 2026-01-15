@@ -644,6 +644,71 @@ You must close and reopen any opened repositories in GitUp after changing this s
                                     </constraints>
                                 </view>
                             </tabViewItem>
+                            <tabViewItem label="{500, 220}" identifier="ai" id="d1n-5D-p8Q">
+                                <view key="view" translatesAutoresizingMaskIntoConstraints="NO" id="qJY-L3-U6G">
+                                    <rect key="frame" x="0.0" y="0.0" width="503" height="219"/>
+                                    <subviews>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oGH-9L-F8b">
+                                            <rect key="frame" x="14" y="188" width="118" height="16"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="Commit Message Command:" id="aJ2-3f-k8L">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="c8Q-0C-tx8" editable="YES" selectable="YES" bordered="YES" bezeled="YES">
+                                            <rect key="frame" x="135" y="182" width="345" height="22"/>
+                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="codex exec &quot;$PROMPT\n\n$DIFF&quot; 2&gt;/dev/null" id="mJx-2Z-LtY" editable="YES" selectable="YES" bordered="YES" bezeled="YES">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <binding destination="AR1-cq-KNa" name="value" keyPath="values.CommitMessageCommand" id="0Og-BT-Nx0">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSConditionallySetsEnabled" value="NO"/>
+                                                        <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </textField>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="5vT-Uk-9n0">
+                                            <rect key="frame" x="135" y="150" width="127" height="18"/>
+                                            <buttonCell key="cell" type="push" title="Reset to Default" bezelStyle="rounded" imagePosition="left" alignment="center" inset="2" id="nBF-3d-rGI">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="resetCommitMessageCommand:" target="-2" id="cXo-3x-QYk"/>
+                                            </connections>
+                                        </button>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="345" translatesAutoresizingMaskIntoConstraints="NO" id="Vw2-8a-rf6">
+                                            <rect key="frame" x="136" y="106" width="344" height="64"/>
+                                            <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" id="T5S-Qg-pm4">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <string key="title">Use $PROMPT and $DIFF to substitute the prompt and staged diff (wrap in double quotes).
+Use \n for newlines, e.g. codex exec &quot;$PROMPT\n\n$DIFF&quot; 2&gt;/dev/null.</string>
+                                                <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="c8Q-0C-tx8" firstAttribute="top" secondItem="qJY-L3-U6G" secondAttribute="top" constant="15" id="1Hq-0p-2K2"/>
+                                        <constraint firstItem="oGH-9L-F8b" firstAttribute="centerY" secondItem="c8Q-0C-tx8" secondAttribute="centerY" id="7h5-ym-dyA"/>
+                                        <constraint firstItem="5vT-Uk-9n0" firstAttribute="top" secondItem="c8Q-0C-tx8" secondAttribute="bottom" constant="8" id="BtA-1S-9sC"/>
+                                        <constraint firstItem="Vw2-8a-rf6" firstAttribute="top" secondItem="5vT-Uk-9n0" secondAttribute="bottom" constant="8" id="Erp-1j-3k1"/>
+                                        <constraint firstItem="c8Q-0C-tx8" firstAttribute="leading" secondItem="oGH-9L-F8b" secondAttribute="trailing" constant="8" id="MwT-9N-0qC"/>
+                                        <constraint firstItem="5vT-Uk-9n0" firstAttribute="leading" secondItem="c8Q-0C-tx8" secondAttribute="leading" id="NDM-4S-NBm"/>
+                                        <constraint firstItem="Vw2-8a-rf6" firstAttribute="leading" secondItem="c8Q-0C-tx8" secondAttribute="leading" id="Nkp-8R-Ohw"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="c8Q-0C-tx8" secondAttribute="trailing" constant="10" id="T0K-Bu-SZB"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Vw2-8a-rf6" secondAttribute="trailing" constant="10" id="Y1L-aY-6Vh"/>
+                                        <constraint firstItem="oGH-9L-F8b" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qJY-L3-U6G" secondAttribute="leading" constant="10" id="eHB-Pe-f1j"/>
+                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Vw2-8a-rf6" secondAttribute="bottom" constant="20" id="irG-8d-6YV"/>
+                                    </constraints>
+                                </view>
+                            </tabViewItem>
                         </tabViewItems>
                     </tabView>
                 </subviews>
@@ -666,10 +731,16 @@ You must close and reopen any opened repositories in GitUp after changing this s
                             <action selector="selectPreferencePane:" target="-2" id="TmO-gY-YJN"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="D1B3426F-1E5E-4A46-A815-86DA65ACF1ED" explicitItemIdentifier="ai" label="AI" paletteLabel="AI" image="sparkles" catalog="system" sizingBehavior="auto" autovalidates="NO" selectable="YES" id="bGi-fu-2YC">
+                        <connections>
+                            <action selector="selectPreferencePane:" target="-2" id="P81-pQ-8ii"/>
+                        </connections>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="Eco-Ip-wwc"/>
                     <toolbarItem reference="doU-9n-plE"/>
+                    <toolbarItem reference="bGi-fu-2YC"/>
                 </defaultToolbarItems>
             </toolbar>
             <point key="canvasLocation" x="-9" y="1152"/>
@@ -679,6 +750,7 @@ You must close and reopen any opened repositories in GitUp after changing this s
     </objects>
     <resources>
         <image name="gearshape" catalog="system" width="16" height="16"/>
+        <image name="sparkles" catalog="system" width="15" height="16"/>
         <image name="switch.2" catalog="system" width="16" height="14"/>
     </resources>
 </document>

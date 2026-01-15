@@ -202,4 +202,8 @@ static NSString* const PreferencesWindowController_Identifier_General = @"genera
   }
 }
 
+- (IBAction)resetCommitMessageCommand:(id)sender {
+  [NSUserDefaults.standardUserDefaults setObject:kDefaultCommitMessageCommand forKey:kUserDefaultsKey_CommitMessageCommand];
+}
+
 @end
